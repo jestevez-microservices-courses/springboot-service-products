@@ -4,6 +4,7 @@ import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.joseluisestevez.msa.products.models.entity.Product;
@@ -21,7 +22,7 @@ public class ProductController {
 	}
 	
 	@GetMapping("/view/{id}")
-	public Product view(Long id) {
+	public Product view(@PathVariable Long id) {
 		return productService.findById(id);
 	}
 }
