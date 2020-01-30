@@ -7,6 +7,10 @@ import com.joseluisestevez.msa.products.models.entity.Product;
 public interface ProductService {
 
 	List<Product> findAll();
-	
+
 	Product findById(Long id);
+
+	Product save(Product product);
+
+	void deleteById(Long id);
 }
