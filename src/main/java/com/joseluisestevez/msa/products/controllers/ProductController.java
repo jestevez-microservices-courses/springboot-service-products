@@ -15,8 +15,10 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.joseluisestevez.msa.commons.products.dto.ProductDto;
 import com.joseluisestevez.msa.products.models.entity.Product;
 import com.joseluisestevez.msa.products.service.ProductService;
+import com.joseluisestevez.msa.utils.dto.DtoUtils;
 
 @RestController
 public class ProductController {
@@ -24,37 +26,42 @@ public class ProductController {
 	@Autowired
 	private ProductService productService;
 
+	private final DtoUtils<ProductDto, Product> dtoUtils = new DtoUtils<>(
+			ProductDto.class, Product.class);
+
 	@Value("${server.port}")
 	private Integer port;
 
 	@GetMapping("/list")
-	public List<Product> list() {
+	public List<ProductDto> list() {
 		return productService.findAll().stream().map(product -> {
 			product.setPort(port);
-			return product;
+			return dtoUtils.convertToDto(product);
 		}).collect(Collectors.toList());
 	}
 
 	@GetMapping("/view/{id}")
-	public Product view(@PathVariable Long id) {
+	public ProductDto view(@PathVariable Long id) {
 		Product product = productService.findById(id);
 		product.setPort(port);
-		return product;
+		return dtoUtils.convertToDto(product);
 	}
 
 	@PostMapping("/create")
 	@ResponseStatus(HttpStatus.CREATED)
-	public Product create(@RequestBody Product product) {
-		return productService.save(product);
+	public ProductDto create(@RequestBody ProductDto productDto) {
+		return dtoUtils.convertToDto(
+				productService.save(dtoUtils.convertToEntity(productDto)));
 	}
 
 	@PutMapping("/edit/{id}")
 	@ResponseStatus(HttpStatus.CREATED)
-	public Product edit(@RequestBody Product product, @PathVariable Long id) {
+	public ProductDto edit(@RequestBody ProductDto productDto,
+			@PathVariable Long id) {
 		Product productDb = productService.findById(id);
-		productDb.setName(product.getName());
-		productDb.setPrice(product.getPrice());
-		return productService.save(productDb);
+		productDb.setName(productDto.getName());
+		productDb.setPrice(productDto.getPrice());
+		return dtoUtils.convertToDto(productService.save(productDb));
 	}
 
 	@DeleteMapping("/delete/{id}")
